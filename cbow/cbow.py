@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class CBOW(nn.Module):
@@ -23,14 +22,13 @@ class CBOW(nn.Module):
             X: inputs, shape of (batch_size, sequence)
 
         Returns:
-            tensor, word distribution
+            tensor, Sentence representation
         """
 
         # (batch_size, sequence) -> (batch_size, sequence, embedding)
         X_embeded = self.embeddings(X)
-        X_sum_sequence = torch.mean(X_embeded, dim=1)
-        word_dist = F.log_softmax(self.linear_proj(X_sum_sequence), dim=1)
+        stnc_repr = torch.mean(X_embeded, dim=1)
 
-        return word_dist
+        return stnc_repr
 
 
