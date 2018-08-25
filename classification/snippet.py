@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchtext import datasets, data
 from torchtext.vocab import GloVe
-
+from cnn.stnc_cnn import StncCNN
 
 # Prepare datasets
 TEXT = data.Field(lower=True, include_lengths=True, batch_first=True)
@@ -35,30 +36,11 @@ print(batch.text)
 print(batch.label)
 
 
-# Model
-conv1_3 = nn.Conv2d(1, 1, kernel_size=(300, 3), stride=1)
-
-conv1_5 = nn.Conv2d(1, 1, kernel_size=(300, 5), stride=1)
-conv1_7 = nn.Conv2d(1, 1, kernel_size=(300, 7), stride=1)
-
-
-max_pool1_3 = nn.MaxPool2d(kernel_size=(528, 298)).to("cuda:0")
-
 vocab_size, word_dim = TEXT.vocab.vectors.size()
-embeddings = nn.Embedding(vocab_size, word_dim)
-embeddings.weight.data.copy_(TEXT.vocab.vectors)
-
 
 X = batch.text[0]
-n_data, n_word = X.size()
 
-X_embed = embeddings(X)
+stnc_cnn = StncCNN(vocab_size=vocab_size,
+                   word_dim=word_dim)
 
-X_view = X_embed.view(n_data, 1, n_word, 300)
-
-X_conv1_3 = conv1_3(X_view)
-
-X_max_pool1_3 = max_pool1_3(X_conv1_3)
-
-X_final = torch.squeeze(X_max_pool1_3)
-
+stnc_cnn.embeddings.weight.data.copy_(TEXT.vocab.vectors)
