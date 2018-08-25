@@ -3,11 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class StncCNN(nn.Module):
+class SentenceCNN(nn.Module):
 
     def __init__(self, vocab_size, word_dim):
-        super(StncCNN, self).__init__()
-
+        super(SentenceCNN, self).__init__()
         self.vocab_size = vocab_size
         self.word_dim = word_dim
 

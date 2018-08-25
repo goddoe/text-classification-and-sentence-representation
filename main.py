@@ -1,47 +1,20 @@
 import torch
 import torch.optim as optim
 import torch.nn as nn
-import torch.nn.functional as F
-from torchtext import datasets, data
-from torchtext.vocab import GloVe
 from cnn.stnc_cnn import SentenceCNN
+from datasets import get_IMDB_iter
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-# Prepare datasets
-TEXT = data.Field(lower=True, include_lengths=True, batch_first=True)
-LABEL = data.Field(sequential=False)
-
-# make splits for data
-train, test = datasets.IMDB.splits(TEXT, LABEL)
-
-# print information about the data
-print('train.fields', train.fields)
-print('len(train)', len(train))
-print('vars(train[0])', vars(train[0]))
-
-# build the vocabulary
-TEXT.build_vocab(train, vectors=GloVe(name='6B', dim=300))
-LABEL.build_vocab(train)
-
-# print vocab information
-print('len(TEXT.vocab)', len(TEXT.vocab))
-print('TEXT.vocab.vectors.size()', TEXT.vocab.vectors.size())
-
-batch_size = 128
-# make iterator for splits
-train_iter, test_iter = data.BucketIterator.splits(
-            (train, test), batch_size=batch_size, device=device)
-
-# print batch information
-batch = next(iter(train_iter))
-print(batch.text)
-print(batch.label)
-
-
-vocab_size, word_dim = TEXT.vocab.vectors.size()
-batch_size = train_iter.batch_size
+# Get data
+(train_iter,
+ test_iter,
+ vocab_size,
+ word_dim,
+ batch_size) = get_IMDB_iter(batch_size=128,
+                             devic=device,
+                             flag_use_pretrained=True)
 
 
 class ClfSentenceCNN(nn.Module):

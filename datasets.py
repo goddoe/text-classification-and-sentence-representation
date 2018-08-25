@@ -1,108 +1,44 @@
-import torch
-from torch.utils.data import Dataset
+from torchtext import datasets, data
+from torchtext.vocab import GloVe
 
 
-def _get_word_cnt_dict(corpus):
-    """Counts words in corpus.
+def get_IMDB_iter(batch_size=32,
+                  root=".data",
+                  device="cuda:0",
+                  flag_use_pretrained=True):
+    # Prepare datasets
+    TEXT = data.Field(lower=True, include_lengths=True, batch_first=True)
+    LABEL = data.Field(sequential=False)
 
-    Args:
-        corpus (str): full text.
+    # make splits for data
+    train, test = datasets.IMDB.splits(TEXT, LABEL, root=root)
 
-    Returns:
-        dict, dict of word count.
-    """
-    word_cnt_dict = {}
-    for word in corpus:
-        if word in word_cnt_dict:
-            word_cnt_dict[word] += 1
-        else:
-            word_cnt_dict[word] = 1
-    return word_cnt_dict
+    # print information about the data
+    print('train.fields', train.fields)
+    print('len(train)', len(train))
+    print('vars(train[0])', vars(train[0]))
 
+    # build the vocabulary
+    if flag_use_pretrained:
+        TEXT.build_vocab(train, vectors=GloVe(name='6B', dim=300))
+    else:
+        TEXT.build_vocab(train)
+    LABEL.build_vocab(train)
 
-def _to_tensor(sample):
-    return (torch.tensor(sample[0], dtype=torch.long),
-            torch.tensor(sample[1], dtype=torch.long))
+    # print vocab information
+    print('len(TEXT.vocab)', len(TEXT.vocab))
+    print('TEXT.vocab.vectors.size()', TEXT.vocab.vectors.size())
 
+    # make iterator for splits
+    train_iter, test_iter = data.BucketIterator.splits(
+                (train, test), batch_size=batch_size, device=device)
 
-class WordContextDataset(Dataset):
-    """
-
-    Attributes:
-        corpus (list): list of corpus word.
-        vocab_size (int): size of vocabulary.
-        idx_word_dict (dict): dictionary which consists of
-                              index as key and word as value.
-        word_idx_dict (dict): dictionary which consists of
-                              word as key and index as value.
-    """
-
-    def __init__(self,
-                 corpus=None,
-                 corpus_path=None,
-                 preprocess=None,
-                 transform=None,
-                 context_size=2,
-                 min_word=2):
-        """
-        Args:
-            corpus_path (str): corpus txt path
-            preprocess (object): preprocess to raw txt file.
-            transform (object): transform function. transform must contains
-                                a function of converting input to tensor.
-        """
-        if transform is None:
-            transform = _to_tensor
-
-        self.transform = transform
-        self.preprocess = preprocess
-
-        if corpus is None and corpus_path is None:
-            raise Exception("either should be specified")
-
-        self.corpus = corpus
-        if corpus_path:
-            if corpus:
-                print("Ignore corpus param")
-            with open(corpus_path, "rt") as f:
-                self.corpus = f.read()
-
-        if self.preprocess:
-            self.corpus = self.preprocess(self.corpus)
-        else:
-            self.corpus = self.corpus.split()
-
-        self.word_cnt_dict = _get_word_cnt_dict(self.corpus)
-        word_cnt_tuple_list = sorted(self.word_cnt_dict.items(),
-                                     key=lambda t: t[1],
-                                     reverse=True)
-
-        # Make idx_word_dict, word_idx_dict
-        self.idx_word_dict = {}
-        for i, (word, cnt) in enumerate(word_cnt_tuple_list):
-            if cnt < min_word:
-                break
-            self.idx_word_dict[i] = word
-
-        self.word_idx_dict = {word: idx
-                              for idx, word in self.idx_word_dict.items()}
-        self.vocab_size = len(self.idx_word_dict)
-
-        # Make dataset
-        self.data = []
-        for i in range(context_size, len(self.corpus)-context_size):
-            context = [self.word_idx_dict[self.corpus[i + d]]
-                       for d in range(-context_size, context_size+1)
-                       if d != 0]
-            self.data.append((context, self.word_idx_dict[self.corpus[i]]))
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        sample = self.data[idx]
-        if self.transform:
-            sample = self.transform(sample)
-        return sample
+    vocab_size, word_dim = TEXT.vocab.vectors.size()
+    
+    class DataContainer:
+        def __init__(self):
+            self.vocab_size = vocab_size
+            self. word_dim = word_dim
 
 
+    return train_iter, test_iter, vocab_size, word_dim, batch_size
