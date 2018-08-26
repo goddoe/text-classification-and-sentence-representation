@@ -2,6 +2,14 @@ from torchtext import datasets, data
 from torchtext.vocab import GloVe
 
 
+class DataContainer:
+    def __init__(self, train_iter, test_iter, embeddings):
+        self.train_iter = train_iter
+        self.test_iter = test_iter
+        self.embeddings = embeddings
+        self.vocab_size, self.embed_dim = self.embeddings.size()
+
+
 def get_IMDB_iter(batch_size=32,
                   root=".data",
                   device="cuda:0",
@@ -31,14 +39,13 @@ def get_IMDB_iter(batch_size=32,
 
     # make iterator for splits
     train_iter, test_iter = data.BucketIterator.splits(
-                (train, test), batch_size=batch_size, device=device)
+                (train, test), batch_size=batch_size,
+                repeat=False, device=device)
 
-    vocab_size, word_dim = TEXT.vocab.vectors.size()
-    
-    class DataContainer:
-        def __init__(self):
-            self.vocab_size = vocab_size
-            self. word_dim = word_dim
+    vocab_size, embed_dim = TEXT.vocab.vectors.size()
 
+    result = DataContainer(train_iter=train_iter,
+                           test_iter=test_iter,
+                           embeddings=TEXT.vocab.vectors)
 
-    return train_iter, test_iter, vocab_size, word_dim, batch_size
+    return result

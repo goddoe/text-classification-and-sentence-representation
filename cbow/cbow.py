@@ -13,7 +13,7 @@ class CBOW(nn.Module):
         super(CBOW, self).__init__()
 
         self.embeddings = nn.Embedding(vocab_size, embed_dim)
-        self.linear_proj = nn.Linear(embed_dim, vocab_size)
+        self.output_dim = embed_dim
 
     def forward(self, X):
         """Embed sequence and get word distribution of prediction.

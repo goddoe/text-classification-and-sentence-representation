@@ -14,6 +14,8 @@ class RN(nn.Module):
         self.linear_r = nn.Linear(embed_dim, embed_dim)
         self.relation = nn.Linear(embed_dim, embed_dim)
 
+        self.output_dim = embed_dim
+
     def forward(self, X):
         """Embed sequence and get word distribution of prediction.
 
@@ -25,7 +27,7 @@ class RN(nn.Module):
         """
         X_embed = self.embeddings(X)
 
-        X_embed_tuple_list = product(X_embed)
+        X_embed_tuple_list = product(X_embed, X_embed)
 
         N = 0
         stnc_repr = 0
