@@ -12,7 +12,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # ======================================
 # Get data
-batch_size = 16
+batch_size = 128
 d = get_IMDB_iter(batch_size=batch_size,
                   device=device,
                   flag_use_pretrained=True)

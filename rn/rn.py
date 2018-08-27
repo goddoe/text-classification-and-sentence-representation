@@ -1,5 +1,6 @@
 from itertools import product
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -27,16 +28,20 @@ class RN(nn.Module):
         """
         X_embed = self.embeddings(X)
 
-        X_embed_tuple_list = product(X_embed, X_embed)
+        X_embed_tuple_list = []
+        for elem in X_embed:
+            X_embed_tuple_list.append(product(elem, elem))
 
-        N = 0
-        stnc_repr = 0
+        stnc_repr_list = []
+        for row in X_embed_tuple_list:
+            N = 0
+            stnc_repr = 0
+            for X_embed_l, X_embed_r in row:
+                rn = self.relation(
+                        F.relu(
+                            self.linear_l(X_embed_l) + self.linear_r(X_embed_r)))
+                N += 1
+                stnc_repr = stnc_repr + (rn-stnc_repr)/N  # Incremental mean
+            stnc_repr_list.append(stnc_repr)
 
-        for X_embed_l, X_embed_r in X_embed_tuple_list:
-            rn = self.relation(
-                    F.relu(
-                        self.linear_l(X_embed_l) + self.linear_r(X_embed_r)))
-            N += 1
-            stnc_repr = stnc_repr + (rn-stnc_repr)/N  # Incremental mean
-
-        return stnc_repr
+        return torch.stack(stnc_repr_list, dim=0)
