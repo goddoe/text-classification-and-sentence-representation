@@ -76,7 +76,8 @@ train(model=clf_rn,
 clf_stnc_cnn = Classifier(sr_model=SentenceCNN,
                           output_dim=2,
                           vocab_size=d.vocab_size,
-                          embed_dim=d.embed_dim)
+                          embed_dim=d.embed_dim,
+                          window_win_size=[3, 5, 7])
 clf_stnc_cnn.to(device)
 clf_stnc_cnn.sr_model.embeddings.weight.data.copy_(d.embeddings)
 

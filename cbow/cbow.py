@@ -25,13 +25,8 @@ class CBOW(nn.Module):
         Returns:
             torch.tensor, Sentence representation.
         """
-
-
-
         # (batch_size, sequence) -> (batch_size, sequence, embedding)
         X_embeded = self.embeddings(X)
         stnc_repr = torch.mean(X_embeded, dim=1)
 
         return stnc_repr
-
-
