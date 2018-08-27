@@ -10,10 +10,10 @@ class DataContainer:
         self.vocab_size, self.embed_dim = self.embeddings.size()
 
 
-def get_IMDB_iter(batch_size=32,
-                  root=".data",
-                  device="cuda:0",
-                  flag_use_pretrained=True):
+def get_IMDB(batch_size=32,
+             root=".data",
+             device="cuda:0",
+             flag_use_pretrained=True):
     # Prepare datasets
     TEXT = data.Field(lower=True, include_lengths=True, batch_first=True)
     LABEL = data.Field(sequential=False)

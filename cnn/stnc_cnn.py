@@ -5,8 +5,9 @@ import torch.nn.functional as F
 
 class SentenceCNN(nn.Module):
 
-    def __init__(self, vocab_size, embed_dim):
+    def __init__(self, vocab_size, embed_dim, **kwargs):
         super(SentenceCNN, self).__init__()
+        assert len(kwargs) == 0, "Shouldn't have a single option."
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
 
@@ -22,6 +23,15 @@ class SentenceCNN(nn.Module):
         self.output_dim = len(self.word_win_size)
 
     def forward(self, X):
+        """Feed-forward CNN.
+
+        Args:
+            X: inputs, shape of (batch_size, sequence).
+
+        Returns:
+            torch.tensor, Sentence representation.
+        """
+
         n_data, n_word = X.size()
 
         X = self.embeddings(X)

@@ -3,7 +3,7 @@ import torch.nn as nn
 from cbow.cbow import CBOW
 from rn.rn import RN
 from cnn.stnc_cnn import SentenceCNN
-from datasets import get_IMDB_iter
+from datasets import get_IMDB
 from train_helper import train
 
 
@@ -12,20 +12,21 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # ======================================
 # Get data
-batch_size = 128
-d = get_IMDB_iter(batch_size=batch_size,
-                  device=device,
-                  flag_use_pretrained=True)
+batch_size = 64
+d = get_IMDB(batch_size=batch_size,
+             device=device,
+             flag_use_pretrained=True)
 
 
 # ======================================
 # A classifier, arbitary graph, on the top of sentence representation.
 class Classifier(nn.Module):
-    def __init__(self, sr_model, output_dim, vocab_size, embed_dim):
+    def __init__(self, sr_model, output_dim, vocab_size, embed_dim, **kwargs):
         super(Classifier, self).__init__()
 
         self.sr_model = sr_model(vocab_size=vocab_size,
-                                 embed_dim=embed_dim)
+                                 embed_dim=embed_dim,
+                                 **kwargs)
 
         self.input_dim = self.sr_model.output_dim
         self.output_dim = output_dim
@@ -56,7 +57,8 @@ train(model=clf_cbow,
 clf_rn = Classifier(sr_model=RN,
                     output_dim=2,
                     vocab_size=d.vocab_size,
-                    embed_dim=d.embed_dim)
+                    embed_dim=d.embed_dim,
+                    max_len=50)
 clf_rn.to(device)
 clf_rn.sr_model.embeddings.weight.data.copy_(d.embeddings)
 
