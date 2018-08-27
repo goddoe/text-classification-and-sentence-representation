@@ -1,11 +1,11 @@
-from itertools import product
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class RN(nn.Module):
+    """Implementation of Relation Network
+    """
 
     def __init__(self, vocab_size, embed_dim):
         super(RN, self).__init__()
@@ -26,22 +26,14 @@ class RN(nn.Module):
         Returns:
             tensor, Sentence representation
         """
-        X_embed = self.embeddings(X)
 
-        X_embed_tuple_list = []
-        for elem in X_embed:
-            X_embed_tuple_list.append(product(elem, elem))
+        batch_size, n_sentence = X.size()
 
-        stnc_repr_list = []
-        for row in X_embed_tuple_list:
-            N = 0
-            stnc_repr = 0
-            for X_embed_l, X_embed_r in row:
-                rn = self.relation(
-                        F.relu(
-                            self.linear_l(X_embed_l) + self.linear_r(X_embed_r)))
-                N += 1
-                stnc_repr = stnc_repr + (rn-stnc_repr)/N  # Incremental mean
-            stnc_repr_list.append(stnc_repr)
+        X_embed = self.embeddings(X)  # (batch_size x sentence x embed_dim)
 
-        return torch.stack(stnc_repr_list, dim=0)
+        X_i = X_embed.unsqueeze(1).repeat(1, n_sentence, 1, 1)
+        X_j = X_embed.unsqueeze(2).repeat(1, 1, n_sentence, 1)
+
+        X_combi = torch.cat([X_i, X_j], dim=3)
+        
+
