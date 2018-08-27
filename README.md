@@ -10,7 +10,7 @@ PyTorch implementation of several sentence representation methods: CBOW, Relatio
 
 
 ## Experiments
-Training without fine-tuning (eg. parameter optimizer and pretraining).
+Experiments without fine-tuning.
 
 ### Common Settings.
 
@@ -20,4 +20,5 @@ Training without fine-tuning (eg. parameter optimizer and pretraining).
 Model|Epochs|Train Accuracy|Test Accuracy
 ---|---|---|---
 CBOW|5|0.95|0.89
+RN|5|1.0|0.70
 CNN|5|1.0|0.82
