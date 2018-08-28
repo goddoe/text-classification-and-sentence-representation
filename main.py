@@ -40,7 +40,7 @@ clf_rn = Classifier(sr_model=RN,
                     output_dim=2,
                     vocab_size=d.vocab_size,
                     embed_dim=d.embed_dim,
-                    max_len=50)
+                    max_len=100)
 clf_rn.to(device)
 clf_rn.sr_model.embeddings.weight.data.copy_(d.embeddings)
 
