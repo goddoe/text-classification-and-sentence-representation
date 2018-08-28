@@ -6,12 +6,18 @@ class RN(nn.Module):
     """Sentence Representation with Relation Network.
     """
 
-    def __init__(self, vocab_size, embed_dim, **kwargs):
+    def __init__(self, vocab_size, embed_dim, max_len=100):
+        """
+        Args:
+            vocab_size (int): size of vocabulary.
+            embed_dim (int): dimension of embedding.
+            max_len (int): max length of sequence.
+        """
         super(RN, self).__init__()
 
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
-        self.max_len = kwargs['max_len'] if 'max_len' in kwargs else 100
+        self.max_len = max_len
         self.output_dim = embed_dim
 
         self.embeddings = nn.Embedding(vocab_size, embed_dim)
@@ -24,10 +30,10 @@ class RN(nn.Module):
         """Feed-forward Relation Network.
 
         Args:
-            X: inputs, shape of (batch_size, sequence).
+            X (torch.Tensor): inputs, shape of (batch_size, sequence).
 
         Returns:
-            torch.tensor, Sentence representation.
+            torch.Tensor, Sentence representation.
         """
 
         X = X[:, :self.max_len]

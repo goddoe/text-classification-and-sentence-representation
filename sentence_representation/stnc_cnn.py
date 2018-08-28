@@ -8,8 +8,7 @@ class SentenceCNN(nn.Module):
     def __init__(self,
                  vocab_size,
                  embed_dim,
-                 word_win_size=[3, 5, 7],
-                 **kwargs):
+                 word_win_size=[3, 5, 7]):
         """
         Args:
             vocab_size (int): size of vocabulary.
@@ -19,8 +18,7 @@ class SentenceCNN(nn.Module):
         super(SentenceCNN, self).__init__()
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
-
-        self.word_win_size = kwargs['word_win_size'] if 'word_win_size' in kwargs else word_win_size
+        self.word_win_size = word_win_size
 
         self.conv_list = nn.ModuleList(
                             [nn.Conv2d(1, 1, kernel_size=(w, embed_dim))
@@ -35,7 +33,7 @@ class SentenceCNN(nn.Module):
         """Feed-forward CNN.
 
         Args:
-            X: inputs, shape of (batch_size, sequence).
+            X (torch.Tensor): inputs, shape of (batch_size, sequence).
 
         Returns:
             torch.tensor, Sentence representation.

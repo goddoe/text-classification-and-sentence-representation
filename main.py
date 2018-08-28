@@ -1,8 +1,8 @@
 import torch
-import torch.nn as nn
-from cbow.cbow import CBOW
-from rn.rn import RN
-from cnn.stnc_cnn import SentenceCNN
+from classifier.classifier import Classifier
+from sentence_representation.cbow import CBOW
+from sentence_representation.rn import RN
+from sentence_representation.stnc_cnn import SentenceCNN
 from datasets import get_IMDB
 from train_helper import train
 
@@ -16,24 +16,6 @@ batch_size = 64
 d = get_IMDB(batch_size=batch_size,
              device=device,
              flag_use_pretrained=True)
-
-
-# ======================================
-# A classifier, arbitary graph, on the top of sentence representation.
-class Classifier(nn.Module):
-    def __init__(self, sr_model, output_dim, vocab_size, embed_dim, **kwargs):
-        super(Classifier, self).__init__()
-
-        self.sr_model = sr_model(vocab_size=vocab_size,
-                                 embed_dim=embed_dim,
-                                 **kwargs)
-
-        self.input_dim = self.sr_model.output_dim
-        self.output_dim = output_dim
-        self.fc = nn.Linear(self.input_dim, self.output_dim)
-
-    def forward(self, X):
-        return self.fc(self.sr_model(X))
 
 
 # ======================================
