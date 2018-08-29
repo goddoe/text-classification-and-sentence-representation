@@ -56,6 +56,8 @@ class RN(nn.Module):
         X_l = X_l.expand(-1, n_sentence, -1, -1)
         X_r = X_r.expand(-1, -1, n_sentence, -1)
 
-        stnc_repr = self.linear_rn(torch.relu(X_l + X_r)).sum((1, 2))
+        stnc_repr = self.linear_rn(
+                        torch.relu(X_l + X_r)).view(
+                            batch_size, n_sentence*n_sentence, -1).mean(dim=1)
 
         return stnc_repr

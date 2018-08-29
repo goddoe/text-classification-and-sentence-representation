@@ -20,5 +20,5 @@ Experiments without fine-tuning.
 Model|Epochs|Train Accuracy|Test Accuracy
 ---|---|---|---
 CBOW|5|0.95|0.89
-RN|5|1.0|0.70
+RN|5|1.0|0.78
 CNN|5|1.0|0.82

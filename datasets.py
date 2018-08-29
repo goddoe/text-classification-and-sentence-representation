@@ -40,7 +40,7 @@ def get_IMDB(batch_size=32,
     # make iterator for splits
     train_iter, test_iter = data.BucketIterator.splits(
                 (train, test), batch_size=batch_size,
-                repeat=False, device=device)
+                repeat=False, shuffle=True, device=device)
 
     vocab_size, embed_dim = TEXT.vocab.vectors.size()
 
