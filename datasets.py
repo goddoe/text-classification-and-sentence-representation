@@ -16,7 +16,7 @@ def get_IMDB(batch_size=32,
              flag_use_pretrained=True):
     # Prepare datasets
     TEXT = data.Field(lower=True, include_lengths=True, batch_first=True)
-    LABEL = data.Field(sequential=False)
+    LABEL = data.Field(sequential=False, pad_token=None, unk_token=None)
 
     # make splits for data
     train, test = datasets.IMDB.splits(TEXT, LABEL, root=root)
