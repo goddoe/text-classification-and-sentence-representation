@@ -14,7 +14,7 @@ def evaluate(model, data_iter):
         pbar = tqdm(iter(data_iter))
         for batch_i, batch in enumerate(pbar, 1):
             X, X_length = batch.text
-            Y_idx = batch.label - 1
+            Y_idx = batch.label
 
             logit = model(X)
 
