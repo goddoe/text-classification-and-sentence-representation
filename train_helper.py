@@ -58,7 +58,7 @@ def train(model,
         pbar = tqdm(iter(train_iter))
         for batch_i, batch in enumerate(pbar, 1):
             X, X_length = batch.text
-            Y = batch.label - 1
+            Y = batch.label
 
             model.zero_grad()
             Y_pred = model(X)
