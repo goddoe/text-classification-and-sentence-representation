@@ -26,7 +26,7 @@ class SelfAttention(nn.Module):
         self.v_linear = nn.Linear(embed_dim, embed_dim)
 
     def forward(self, X):
-        """Feed-forward CNN.
+        """Single head naive self-attention.
         Args:
             X (torch.Tensor): inputs, shape of (batch_size, sequence).
         Returns:
